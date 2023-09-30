@@ -10,4 +10,5 @@ public class SpringbootMallApplication {
         SpringApplication.run(SpringbootMallApplication.class, args);
     }
 
+
 }
