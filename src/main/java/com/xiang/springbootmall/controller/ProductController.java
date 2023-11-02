@@ -5,6 +5,7 @@ import com.xiang.springbootmall.dto.ProductQueryParams;
 import com.xiang.springbootmall.dto.ProductRequest;
 import com.xiang.springbootmall.model.Product;
 import com.xiang.springbootmall.service.ProductService;
+import com.xiang.springbootmall.util.Page;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -25,7 +26,7 @@ public class ProductController {
 
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProdcuts(
+    public ResponseEntity<Page<Product>> getProdcuts(
             //查詢條件 Filtering
             @RequestParam(required = false) ProductCategory category,
             @RequestParam(required = false) String search,
@@ -46,9 +47,20 @@ public class ProductController {
         productQueryParams.setLimit(fetch);
         productQueryParams.setOffset(offset);
 
-        List<Product> productlist = productService.getProducts(productQueryParams);
+        //取得ProductList
+        List<Product> productList = productService.getProducts(productQueryParams);
 
-        return ResponseEntity.status(HttpStatus.OK).body(productlist);
+        //取得product總數
+        Integer total = productService.countProduct(productQueryParams);
+
+        //分頁
+        Page<Product> page = new Page<>();
+        page.setFetch(fetch);
+        page.setOffset(offset);
+        page.setTotal(total);
+        page.setResult(productList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @GetMapping("/products/{productId}")
